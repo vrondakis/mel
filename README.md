@@ -1,6 +1,6 @@
 Mel is a NodeJS REST framework that makes validation very easy while still giving you control over everything. 
 
-```
+```javascript
 // You can use mel.get, mel.post, mel.put and  mel.delete
 mel.post({
 	// First, define a route
