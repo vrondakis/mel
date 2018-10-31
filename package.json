@@ -1,0 +1,23 @@
+{
+  "name": "mel",
+  "version": "1.0.0",
+  "description": "Mel is a NodeJS REST framework that makes validation very easy while still giving you control over everything.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vrondakis/mel.git"
+  },
+  "author": "Manolis Vrondakis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vrondakis/mel/issues"
+  },
+  "homepage": "https://github.com/vrondakis/mel#readme",
+  "dependencies": {
+    "async": "^2.6.1",
+    "multiparty": "^4.2.1"
+  }
+}

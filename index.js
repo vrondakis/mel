@@ -2,15 +2,23 @@
 // (C) Manolis Vrondakis 2016
 
 var apiList = {};
-var nominal = require('../modules/nominal')();
-var multiparty = require('multiparty')
-var sizeOf = require('image-size')
-var async = require('async')
+const 
+	nominal 	= require('../nominal')(),
+	multiparty 	= require('multiparty'),
+	sizeOf 		= require('image-size'),
+	async 		= require('async'),
+	passport	= require('passport');
 
-const passport			= require('passport');
 
+exports.init = (router) => {
+	exports.router = router;
+}
 
 exports.new = (requestType, options) => {
+	if(!exports.router){
+		console.error('Mel:: new called before router initialised')
+	}
+
 	options = typeof options === 'object' ? options : {}
 	if(!options.route){
 		console.error('Mel:: new called without route')
@@ -29,25 +37,26 @@ exports.new = (requestType, options) => {
 				if(fields[k] && fields[k][0])
 					data[k] = fields[k][0]
 			}
-
+		
 			for(var k in files){
 				if(files[k] && files[k][0])
 					data[k] = files[k][0]
 			}
-
+			
 			// console.log("%j - %j - %j", req.body, req.query, req.params)
 
 			options.input(inputs, req);
-
+				
 			var isError = false
 			async.forEach(Object.keys(inputs), (varname, callback) => {
-				inputs[varname].value(data[inputs[varname].name], (value) => {
+				inputs[varname].value(data[inputs[varname].name], (value) => {	
+						
 					if((value===null || value===false) && (!isError)){
 						isError = true
 						return res.json(module.Failure(nominal.LastError, varname)); // Returns JSON error message of specific input
 					}
-
-					args[varname] = value
+	
+					args[varname] = value			
 					callback()
 				}, req)
 
@@ -62,19 +71,19 @@ exports.new = (requestType, options) => {
 
 
 exports.get = (options) => {
-	exports.new(router.get, options)
+	exports.new(exports.router.get, options)
 }
 
 exports.post = (options) => {
-	exports.new(router.post, options)
+	exports.new(exports.router.post, options)
 }
 
 exports.put = (options) => {
-	module.new(router.put, options)
+	module.new(exports.router.put, options)
 }
 
 exports.delete = (options) => {
-	module.new(router.delete, options)
+	module.new(exports.router.delete, options)
 }
 
 exports.string = function(name, help, min, max, def){ // Validates a string
@@ -145,14 +154,15 @@ exports.verified = function(){
 
 exports.success = function(array){ // Empty API for success callback
 	array = typeof array !== 'undefined' ? array : {};
-	return this.Output( { status:'ok', data:array } );
+	return this.output( { status:'ok', data:array } );
 }
 
 exports.failure = function(message, varname){ // Empty API for falure callback
 	varname = typeof varname !== 'undefined' ? varname : '';
-	return module.Output( { status:'failure', message:varname +(varname==''?'':' ')+ message, varname:varname } );
+	return this.output( { status:'failure', message:varname +(varname==''?'':' ')+ message, varname:varname } );
 }
 
 exports.output = function(array){
-	return array; // Outputs data to caller
+	return array;
 }
+
