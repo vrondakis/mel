@@ -3,10 +3,9 @@
 
 var apiList = {};
 const
-	nominal 	= require('../nominal')(),
+	nominal 	= require('./nominal')(),
 	multiparty 	= require('multiparty'),
-	async 		= require('async'),
-	passport	= require('passport');
+	async 		= require('async');
 
 
 exports.init = (router) => {
@@ -83,6 +82,11 @@ exports.put = (options) => {
 
 exports.delete = (options) => {
 	module.new(exports.router.delete, options)
+}
+
+
+exports.all = (options) => {
+	module.new(exports.router.all, options)
 }
 
 exports.string = function(name, help, min, max, def){ // Validates a string
