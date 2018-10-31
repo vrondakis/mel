@@ -2,7 +2,7 @@
 // (C) Manolis Vrondakis 2016
 
 var apiList = {};
-var nominal = require('../../modules/nominal')();
+var nominal = require('../modules/nominal')();
 var multiparty = require('multiparty')
 var sizeOf = require('image-size')
 var async = require('async')
@@ -22,33 +22,32 @@ exports.new = (requestType, options) => {
 
 	options.input = typeof options.input !== 'undefined' ? options.input : function(){}
 	requestType(options.route, (req, res, next) => {
-		var data = {..req.body, ..req.query}
+		var data = {...req.body, ...req.query}
 		var form = new multiparty.Form({maxFilesSize:process.env.MAX_UPLOAD, uploadDir:process.env.ROOT_PATH+'/content/tmp'})
 		form.parse(req, (err, fields, files) => {
 			for(var k in fields){
 				if(fields[k] && fields[k][0])
 					data[k] = fields[k][0]
 			}
-		
+
 			for(var k in files){
 				if(files[k] && files[k][0])
 					data[k] = files[k][0]
 			}
-			
+
 			// console.log("%j - %j - %j", req.body, req.query, req.params)
 
 			options.input(inputs, req);
-				
+
 			var isError = false
 			async.forEach(Object.keys(inputs), (varname, callback) => {
-				inputs[varname].value(data[inputs[varname].name], (value) => {	
-						
+				inputs[varname].value(data[inputs[varname].name], (value) => {
 					if((value===null || value===false) && (!isError)){
 						isError = true
 						return res.json(module.Failure(nominal.LastError, varname)); // Returns JSON error message of specific input
 					}
-	
-					args[varname] = value			
+
+					args[varname] = value
 					callback()
 				}, req)
 
