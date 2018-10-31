@@ -2,10 +2,9 @@
 // (C) Manolis Vrondakis 2016
 
 var apiList = {};
-const 
+const
 	nominal 	= require('../nominal')(),
 	multiparty 	= require('multiparty'),
-	sizeOf 		= require('image-size'),
 	async 		= require('async'),
 	passport	= require('passport');
 
