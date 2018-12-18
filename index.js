@@ -1,19 +1,20 @@
 // Mel NodeJS API library
 // (C) Manolis Vrondakis 2016
 
-var apiList = {};
 const
 	nominal 	= require('../nominal')(),
-	multiparty 	= require('multiparty'),
 	async 		= require('async'),
-	passport	= require('passport');
+	passport	= require('passport'),
+	multiparty	= require('multiparty')
 
+
+exports.apis = []
 
 exports.init = (router) => {
 	exports.router = router;
 }
 
-exports.new = (requestType, options) => {
+function new_(requestType, options) {
 	if(!exports.router){
 		console.error('Mel:: new called before router initialised')
 	}
@@ -24,11 +25,23 @@ exports.new = (requestType, options) => {
 		return
 	}
 
+
 	var inputs = {}
 	var args = {}
 
+	console.log(options)
 	options.input = typeof options.input !== 'undefined' ? options.input : function(){}
-	requestType(options.route, (req, res, next) => {
+
+
+	var apiInputs = {}
+	options.input(apiInputs)
+	exports.apis.push({
+		route : options.route,
+		method : requestType,
+		inputs : apiInputs
+	})
+
+	exports.router[requestType](options.route, (req, res, next) => {
 		var data = {...req.body, ...req.query}
 		var form = new multiparty.Form({maxFilesSize:process.env.MAX_UPLOAD, uploadDir:process.env.ROOT_PATH+'/content/tmp'})
 		form.parse(req, (err, fields, files) => {
@@ -52,7 +65,7 @@ exports.new = (requestType, options) => {
 						
 					if((value===null || value===false) && (!isError)){
 						isError = true
-						return res.json(module.Failure(nominal.LastError, varname)); // Returns JSON error message of specific input
+						return res.json(exports.failure(nominal.LastError, varname)); // Returns JSON error message of specific input
 					}
 	
 					args[varname] = value			
@@ -70,19 +83,23 @@ exports.new = (requestType, options) => {
 
 
 exports.get = (options) => {
-	exports.new(exports.router.get, options)
+	new_('get', options)
 }
 
 exports.post = (options) => {
-	exports.new(exports.router.post, options)
+	new_('post', options)
 }
 
 exports.put = (options) => {
-	module.new(exports.router.put, options)
+	new_('put', options)
 }
 
 exports.delete = (options) => {
-	module.new(exports.router.delete, options)
+	new_('delete', options)
+}
+
+exports.all = (options) => {
+	 new_('all', options)
 }
 
 exports.string = function(name, help, min, max, def){ // Validates a string
@@ -136,17 +153,25 @@ exports.image = function(name, help, required, maxSize, dimensions){
 	}}
 }
 	
-exports.verified = function(){
-	if(typeof rank === 'undefined' || !rank) rank = 0;
+exports.verified = function(power){
+	if(typeof power === 'undefined') power = 0;
 
 	return { type : 'logged-in', name: "user", help:"", def:false, value: 
 		function(val, cb, req){
-			if(!req.user || !req.isAuthenticated()){
-				nominal.LastError = "401";
-				return cb(false);	
+			if(power===false && req.isAuthenticated()){
+				nominal.LastError = "402"
+				return cb(false)
+			} else{
+				return cb(0)
 			}
+
+			if(power >= 0 && (!req.user || !req.isAuthenticated)){
+				nominal.LastError = "401"
+				return cb(false)
+			}
+
+			return cb(true)
 				
-			return cb(req.user.id);
 		}
 	}
 }
