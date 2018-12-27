@@ -158,11 +158,10 @@ exports.verified = function(power){
 
 	return { type : 'logged-in', name: "user", help:"", def:false, value: 
 		function(val, cb, req){
+			console.log(req.user, req.isAuthenticated(), power)
 			if(power===false && req.isAuthenticated()){
 				nominal.LastError = "402"
 				return cb(false)
-			} else{
-				return cb(0)
 			}
 
 			if(power >= 0 && (!req.user || !req.isAuthenticated)){
