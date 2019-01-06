@@ -169,7 +169,7 @@ exports.verified = function(power){
 				return cb(false)
 			}
 
-			return cb(true)
+			return cb(req.user.id)
 				
 		}
 	}
