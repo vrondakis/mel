@@ -2,7 +2,7 @@
 // (C) Manolis Vrondakis 2016
 
 const
-	nominal 	= require('../nominal')(),
+	nominal 	= require('./nominal')(),
 	async 		= require('async'),
 	passport	= require('passport'),
 	multiparty	= require('multiparty')
