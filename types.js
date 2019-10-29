@@ -21,8 +21,8 @@ exports.int = (name, description, options) => {
 		value : value => {
 			const float = validateNumber(value);
 			if(!float || ((float | 0) === float)) return validationError("is not a valid integer");
-			if(options.min && options.min > value) return validationError(`minimum size is ${options.min}`);
-			if(options.max && options.max < value) return validationError(`maximum size is ${options.min}`);
+			if(options.min !== undefined && options.min > value) return validationError(`minimum size is ${options.min}`);
+			if(options.max !== undefined && options.max < value) return validationError(`maximum size is ${options.min}`);
 			
 			return validationSuccess(value);
 		}
@@ -38,8 +38,8 @@ exports.float = (name, description, options) => {
 		value : value => {
 			const float = validateNumber(value);
 			if(!float) return validationError("is not a valid float");
-			if(options.min && options.min > value) return validationError(`must be at least ${options.min}`);
-			if(options.max && options.max < value) return validationError(`must not be more than ${options.min}`);
+			if(options.min !== undefined && options.min > value) return validationError(`must be at least ${options.min}`);
+			if(options.max !== undefined && options.max < value) return validationError(`must not be more than ${options.min}`);
 			
 			return validationSuccess(value);
 		}
