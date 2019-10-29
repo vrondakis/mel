@@ -1,10 +1,10 @@
 {
   "name": "mel",
   "version": "1.0.0",
-  "description": "Mel is a NodeJS REST framework that makes validation very easy while still giving you control over everything.",
+  "description": "Mel is a NodeJS REST framework that utilises Express",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx mocha"
   },
   "repository": {
     "type": "git",
@@ -16,8 +16,8 @@
     "url": "https://github.com/vrondakis/mel/issues"
   },
   "homepage": "https://github.com/vrondakis/mel#readme",
-  "dependencies": {
-    "async": "^2.6.1",
-    "multiparty": "^4.2.1"
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "^6.2.2"
   }
 }
