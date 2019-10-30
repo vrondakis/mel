@@ -49,20 +49,29 @@ const newApi = async (requestType, options) => {
 	if(!options.run)
 		return console.error("mel: called without run function");
 
+		console.log("options is: ",options);
+
+	if(!options.description)
+		console.log(`mel:: ${options.route} API added without description`)
+
 	if(!options.input)
 		options.input = () => {};
+
+
+	const inputs = {};
+	options.input(inputs, {});
+
+
+	apis.push({
+		route : options.route,
+		method : requestType,
+		description : options.description,
+		inputs
+	});
 
 	_router[requestType](options.route, async (req, res, next) => {
 		const data = getRequestData(requestType, req);
 
-		const inputs = {};
-		options.input(inputs, req);
-
-		apis.push({
-			route : options.route,
-			method : requestType,
-			inputs : inputs
-		});
 
 		const validatedData = {};
 		const errors = [];
@@ -81,8 +90,8 @@ const newApi = async (requestType, options) => {
 		if(errors.length > 0)
 			return res.status(res.statusCode === 200 ? 400 : res.statusCode).json(failure(errors.map(e => `${e.varname} ${e.error}`).join(" "), errors));
 
-		const result = await options.run(validatedData);
-		return res.json(result);		
+		const result = await options.run(validatedData, req, res, next);
+		if(result && result.status) res.json(result);
 	});
 };
 
@@ -106,7 +115,13 @@ const all = (options) => {
 	newApi('all', options)
 }
 
+const openApi = require('./open-api');
+const generateOpenApi = () => {
+	return openApi(apis);
+}
+
 const validators = require('./types');
+
 module.exports = {
 	// Validators:
 	...validators,
@@ -121,6 +136,7 @@ module.exports = {
 	// Utility methods
 	success,
 	failure,
-	init
+	init,
+	generateOpenApi
 }
 

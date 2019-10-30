@@ -15,6 +15,11 @@ const validateNumber = (number) => {
 exports.int = (name, description, options) => {
 	return {
 		type : "int",
+		schema : {
+			type : "integer",
+			[options.min && "minumum"] : options.min,
+			[options.max && "maximum"] : options.max
+		},
 		name,
 		description,
 		options,
@@ -32,6 +37,11 @@ exports.int = (name, description, options) => {
 exports.float = (name, description, options) => {
 	return {
 		type : "float",
+		schema : {
+			type : "number",
+			[options.min && "minumum"] : options.min,
+			[options.max && "maximum"] : options.max
+		},
 		name,
 		description,
 		options,
@@ -51,6 +61,11 @@ const getByteLength = (str) => encodeURI(str).split(/%..|./).length - 1;
 exports.string = (name, description, options) => {
 	return {
 		type : "string",
+		schema : {
+			type : "string",
+			[options.minLength && "minLength"] : options.minLength,
+			[options.maxLength && "maxLength"] : options.maxLength
+		},
 		name,
 		description,
 		options,
@@ -65,9 +80,15 @@ exports.string = (name, description, options) => {
 
 exports.oneOf = (name, description, options) => ({
 	type : "one-of",
+	dataType : "string",
 	name,
 	description,
 	options,
+	schema : {
+		type : "string",
+		minLength : options.values.reduce((a, b) => a.length > b.length ? a.length : b.length),
+		maxLength : options.values.reduce((a, b) => a.length < b.length ? a.length : b.length)
+	},
 	value : value => {
 		if(options.values.indexOf(value) === -1)
 			return validationError(`must be one of the following: ${options.values.join(", ")}`);
@@ -101,6 +122,11 @@ exports.email = (name, description, options) => ({
 	name,
 	description,
 	options,
+	schema : {
+		type : "string"	,
+		minLength : 6,
+		maxLength : 320
+	},
 	value : value => {
 		value = value.toLowerCase();
 
