@@ -52,10 +52,18 @@ mel.all({
         });    
     },
     run : (args) => {
-        console.log(args);
         return mel.success(args);
     }
 });
+
+// path parameters
+mel.get({
+	route : "/user/:user",
+	description : "",
+	run : ({user}) => {
+		return mel.success(user);
+	}
+})
 
 mel.get({
     route : "/example-error",
@@ -70,4 +78,28 @@ app.use(router);
 
 app.listen(3030, () => {
     console.log(`Server is running on port 3030`);
+});
+
+// custom validator that fails with a status
+const loggedIn = () => ({
+	name : "logged-in",
+	description : "User logged in",
+	hidden : true, // ignore if there's a value or not, useful for checking something in req
+	value : (value, req) => {
+		if(req.user){
+			return types.validationSuccess(req.user)
+		} else
+			return types.validationError("401", 401);
+	}
+});
+
+mel.get({
+	route : "/user",
+	description : "Returns the current users details",
+	input : (input) => {
+		input.user = loggedIn()
+	},
+	run : ({user}) => {
+		return mel.success(user);
+	}
 });

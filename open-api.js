@@ -2,8 +2,8 @@ module.exports = (apis) => {
     const groupedApis = [];
 
     apis.map(api => {
-        const bodyProperties = {}
-        Object.values(api.inputs).forEach((input) => {
+        const bodyProperties = {};
+        Object.values(api.inputs).filter(input => !input.hidden).forEach((input) => {
             bodyProperties[input.name] = input.schema;
         });
 
@@ -12,16 +12,16 @@ module.exports = (apis) => {
             method : api.method,
             summary : api.description || "No description provided",
             parameters : Object.values(api.inputs)
-                .filter(input => api.method === "post" ? input.type === "pathParameter" : true)
+                .filter(input => !input.hidden && (api.method === "post" ? input.type === "pathParameter" : true))
                 .map(input => ({
-                    in : input.type === "pathParameter" ? "path" : "query",
+                    in : input.type === "query",
                     name : input.name,
                     schema : input.schema,
                     required : !!(input.options && input.options.default),
                     type : input.dataType,
                     description : input.description
                 })),
-            [Object.keys(api.inputs).length > 0 && api.method === "post" && "requestBody"] : {
+            [Object.keys(bodyProperties).length > 0 && api.method === "post" && "requestBody"] : {
                 required : true,
                 content : {
                     "application/json" : {

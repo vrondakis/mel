@@ -1,5 +1,6 @@
-const validationError = (error) => ({
+const validationError = (error, status) => ({
 	success : false,
+	status,
 	error
 });
 
@@ -7,6 +8,9 @@ const validationSuccess = (value) => ({
 	success : true,
 	value
 });
+
+exports.validationError = validationError;
+exports.validationSuccess = validationSuccess;
 
 const validateNumber = (number) => {
 	return parseFloat(number) !== NaN;	
@@ -116,6 +120,25 @@ const validateDomain = (value) => {
 	return true;
 }
 
+exports.url = (name, description, options) => ({
+	type : "url",
+	name,
+	description,
+	options,
+	schema : {
+		type : "string",
+		minLength : 6,
+		maxLength : 1024
+	},
+	value : (value, req) => {
+		if(6 > getByteLength(value)) return validationError(`must be at least 6 characters`);
+		if(1024 < getByteLength(value)) return validationError(`must not be more than 1024 characters`);
+
+		return validationSuccess(value);
+	}
+});
+
+
 const validEmailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
 exports.email = (name, description, options) => ({
 	type : "email",
@@ -123,7 +146,7 @@ exports.email = (name, description, options) => ({
 	description,
 	options,
 	schema : {
-		type : "string"	,
+		type : "string",
 		minLength : 6,
 		maxLength : 320
 	},

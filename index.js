@@ -36,7 +36,6 @@ const failure = (message, errors) => {
 }
 
 const newApi = async (requestType, options) => {
-	console.log("new api")
 	if(!_router)
 		return console.error('mel: new called before router initialised');
 
@@ -49,8 +48,6 @@ const newApi = async (requestType, options) => {
 	if(!options.run)
 		return console.error("mel: called without run function");
 
-		console.log("options is: ",options);
-
 	if(!options.description)
 		console.log(`mel:: ${options.route} API added without description`)
 
@@ -58,39 +55,42 @@ const newApi = async (requestType, options) => {
 		options.input = () => {};
 
 
-	const inputs = {};
-	options.input(inputs, {});
-
+	const apiInputs = {};
+	options.input(apiInputs, {});
 
 	apis.push({
 		route : options.route,
 		method : requestType,
 		description : options.description,
-		inputs
+		inputs : apiInputs
 	});
 
 	_router[requestType](options.route, async (req, res, next) => {
 		const data = getRequestData(requestType, req);
 
+		const inputs = {}
+		options.input(inputs, req);
 
 		const validatedData = {};
 		const errors = [];
 		for(input of Object.keys(inputs)){
 			const inputValidator = inputs[input];
-			if(data[inputValidator.name] === undefined){
+			if(data[inputValidator.name] === undefined && !inputValidator.hidden){
 				if(inputValidator.options && inputValidator.options.default) validatedData[input] = inputValidator.default;
 				else errors.push({varname : inputValidator.name, error : `must have a value`})
 			} else {
 				const validatedInput = await inputValidator.value(data[inputValidator.name], req);
 				if(validatedInput.success) validatedData[input] = validatedInput.value;
-				else errors.push({varname: inputValidator.name, error: validatedInput.error});
+				else errors.push({varname: inputValidator.name, status : validatedInput.status, error: validatedInput.error});
 			}
 		}
 
-		if(errors.length > 0)
-			return res.status(res.statusCode === 200 ? 400 : res.statusCode).json(failure(errors.map(e => `${e.varname} ${e.error}`).join(" "), errors));
+		if(errors.length > 0){
+			const validatorStatus = errors.filter(error => error.status).map(error => error.status);
+			return res.status(validatorStatus && validatorStatus[0] || 400).json(failure(errors.map(e => `${e.varname} ${e.error}`).join(" "), errors));
+		}
 
-		const result = await options.run(validatedData, req, res, next);
+		const result = await options.run({...validatedData, ...req.params}, req, res, next);
 		if(result && result.status) res.json(result);
 	});
 };
