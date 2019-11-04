@@ -150,7 +150,7 @@ exports.email = (name, description, options) => ({
 		type : "string",
 		minLength : 6,
 		maxLength : 320
-	},e
+	},
 	value : value => {
 		value = value.toLowerCase();
 
