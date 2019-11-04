@@ -16,12 +16,12 @@ const validateNumber = (number) => {
 	return parseFloat(number) !== NaN;	
 }
 
-exports.int = (name, description, options) => {
+exports.int = (name, description, options = {}) => {
 	return {
 		type : "int",
 		schema : {
 			type : "integer",
-			[options.min && "minumum"] : options.min,
+			"minimum" : options.min || 0,
 			[options.max && "maximum"] : options.max
 		},
 		name,
@@ -38,12 +38,12 @@ exports.int = (name, description, options) => {
 	}
 }
 
-exports.float = (name, description, options) => {
+exports.float = (name, description, options = {}) => {
 	return {
 		type : "float",
 		schema : {
 			type : "number",
-			[options.min && "minumum"] : options.min,
+			"minimum" : options.min || 0,
 			[options.max && "maximum"] : options.max
 		},
 		name,
@@ -62,12 +62,12 @@ exports.float = (name, description, options) => {
 
 const getByteLength = (str) => encodeURI(str).split(/%..|./).length - 1;
 
-exports.string = (name, description, options) => {
+exports.string = (name, description, options = {}) => {
 	return {
 		type : "string",
 		schema : {
 			type : "string",
-			[options.minLength && "minLength"] : options.minLength,
+			[options.minLength && "minimum"] : options.min || 0,
 			[options.maxLength && "maxLength"] : options.maxLength
 		},
 		name,
@@ -76,6 +76,7 @@ exports.string = (name, description, options) => {
 		value : value => {
 			if(options.minLength && options.minLength > getByteLength(value)) return validationError(`must be at least ${options.minLength} characters`);
 			if(options.maxLength && options.maxLength < getByteLength(value)) return validationError(`must not be more than ${options.maxLength} characters`);
+			if(options.regex && !options.regex.test(value)) return validationError(`must be in format: ${options.regex.toString()}`);
 
 			return validationSuccess(value);
 		}
@@ -149,7 +150,7 @@ exports.email = (name, description, options) => ({
 		type : "string",
 		minLength : 6,
 		maxLength : 320
-	},
+	},e
 	value : value => {
 		value = value.toLowerCase();
 
