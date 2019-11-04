@@ -1,39 +1,63 @@
 // Mel NodeJS API library
 // (C) Manolis Vrondakis 2016
 
+const multiparty = require("multiparty")
 const apis = [];
 
 let _router = false;
 const init = (router) => {
 	_router = router;
-}
+};
 
-const getRequestData = (method, req) => {
+const formData = new multiparty.Form({
+	maxFilesSize: process.env.MAX_UPLOAD,
+	uploadDir:`${__dirname}/content/tmp`});
+
+// For form/multipart uploads
+const getFormData = async (req) => new Promise((res, rej) => {
+	const data = {};
+	formData.parse(req, (err, fields, files) => {
+		if(fields){
+			Object.keys(fields).map((fieldKey) => {
+				if(fields[fieldKey][0])
+					data[fieldKey] = fields[fieldKey][0]
+			});
+		}
+
+		return res(data);
+	});
+});
+
+const getRequestData = async (method, req) => {
+	if(!req.body) req.body = {};
+
 	switch(method){
 		case "get":
 		case "delete":
 		case "create":
 			return req.query;
 
-		case "post":
-			return req.body;
+		case "post":{
+			const formData = await getFormData(req);
+			return {...req.body, ...formData}
+		}
 
 		case "all":
 			return {...req.query, ...req.body};
 	}
 
 	return {};
-}
+};
 
 const success = (array) => {
 	array = array || {};
 	return { status : 'ok', data : array };
-}
+};
 
 const failure = (message, errors) => {
 	errors = errors || {};
 	return { status:'failure', message, errors };
-}
+};
 
 const newApi = async (requestType, options) => {
 	if(!_router)
@@ -49,7 +73,7 @@ const newApi = async (requestType, options) => {
 		return console.error("mel: called without run function");
 
 	if(!options.description)
-		console.log(`mel:: ${options.route} API added without description`)
+		console.log(`mel:: ${options.route} API added without description`);
 
 	if(!options.input)
 		options.input = () => {};
@@ -64,9 +88,11 @@ const newApi = async (requestType, options) => {
 		description : options.description,
 		inputs : apiInputs
 	});
+	
+	
 
 	_router[requestType](options.route, async (req, res, next) => {
-		const data = getRequestData(requestType, req);
+		const data = await getRequestData(requestType, req);
 
 		const inputs = {}
 		options.input(inputs, req);
