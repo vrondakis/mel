@@ -76,7 +76,7 @@ exports.string = (name, description, options = {}) => {
 		value : value => {
 			if(options.minLength && options.minLength > getByteLength(value)) return validationError(`must be at least ${options.minLength} characters`);
 			if(options.maxLength && options.maxLength < getByteLength(value)) return validationError(`must not be more than ${options.maxLength} characters`);
-			if(options.regex && !options.regex.test(value)) return validationError(`must be in format: ${options.regex.toString()}`);
+			if(options.match && !options.match.test(value)) return validationError(`must be in format: ${options.match.toString()}`);
 
 			return validationSuccess(value);
 		}
