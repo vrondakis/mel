@@ -16,7 +16,9 @@
     "url": "https://github.com/vrondakis/mel/issues"
   },
   "homepage": "https://github.com/vrondakis/mel#readme",
-  "dependencies": {},
+  "dependencies": {
+    "multiparty": "^4.2.1"
+  },
   "devDependencies": {
     "mocha": "^6.2.2"
   }
