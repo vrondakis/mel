@@ -13,7 +13,7 @@ exports.validationError = validationError;
 exports.validationSuccess = validationSuccess;
 
 const validateNumber = (number) => {
-	return parseFloat(number) !== NaN;	
+	return !isNaN(parseFloat(number));
 }
 
 exports.int = (name, description, options = {}) => {
