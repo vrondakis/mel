@@ -9,25 +9,6 @@ const init = (router) => {
 	_router = router;
 };
 
-const formData = new multiparty.Form({
-	maxFilesSize: process.env.MAX_UPLOAD,
-	uploadDir:`${__dirname}/content/tmp`});
-
-// For form/multipart uploads
-const getFormData = async (req) => new Promise((res, rej) => {
-	const data = {};
-	formData.parse(req, (err, fields, files) => {
-		if(fields){
-			Object.keys(fields).map((fieldKey) => {
-				if(fields[fieldKey][0])
-					data[fieldKey] = fields[fieldKey][0]
-			});
-		}
-
-		return res(data);
-	});
-});
-
 const getRequestData = async (method, req) => {
 	if(!req.body) req.body = {};
 
@@ -38,8 +19,7 @@ const getRequestData = async (method, req) => {
 			return req.query;
 
 		case "post":{
-			const formData = await getFormData(req);
-			return {...req.body, ...formData}
+			return req.body;
 		}
 
 		case "all":
