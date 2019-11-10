@@ -1,7 +1,6 @@
 // Mel NodeJS API library
 // (C) Manolis Vrondakis 2016
 
-const multiparty = require("multiparty")
 const apis = [];
 
 let _router = false;
