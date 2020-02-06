@@ -16,6 +16,22 @@ const validateNumber = (number) => {
 	return !isNaN(parseFloat(number));
 }
 
+exports.array = (name, description, options = {}) => {
+	return {
+		type : "array",
+		schema : {
+			type : "array"
+		},
+		name,
+		description,
+		options,
+		value : value => {
+			if(!Array.isArray(value)) return validationError("tags must be an array");
+			return validationSuccess(value);
+		}
+	}
+};
+
 exports.int = (name, description, options = {}) => {
 	return {
 		type : "int",
