@@ -27,6 +27,8 @@ exports.array = (name, description, options = {}) => {
 		options,
 		value : value => {
 			if(!Array.isArray(value)) return validationError("tags must be an array");
+			if(options.filterDuplicates) value = value.filter((item, index) => value.indexOf(item) === index);
+
 			return validationSuccess(value);
 		}
 	}
