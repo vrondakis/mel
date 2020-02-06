@@ -81,7 +81,7 @@ const newApi = async (requestType, options) => {
 		for(input of Object.keys(inputs)){
 			const inputValidator = inputs[input];
 			if(data[inputValidator.name] === undefined && !inputValidator.hidden){
-				if(inputValidator.options && inputValidator.options.default) validatedData[input] = inputValidator.default;
+							if(inputValidator.options && inputValidator.options.default !== undefined) validatedData[input] = inputValidator.default;
 				else errors.push({varname : inputValidator.name, error : `must have a value`})
 			} else {
 				const validatedInput = await inputValidator.value(data[inputValidator.name], req);
