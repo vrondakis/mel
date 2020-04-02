@@ -13,11 +13,11 @@ const getRequestData = async (method, req) => {
 
 	switch(method){
 		case "get":
-		case "delete":
-		case "put":
 			return req.query;
 
-		case "post":{
+		case "post":			
+		case "delete":
+		case "put": {
 			return req.body;
 		}
 
@@ -37,6 +37,8 @@ const failure = (message, errors) => {
 	errors = errors || {};
 	return { status:'failure', message, errors };
 };
+
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const newApi = async (requestType, options) => {
 	if(!_router)
@@ -92,7 +94,7 @@ const newApi = async (requestType, options) => {
 
 		if(errors.length > 0){
 			const validatorStatus = errors.filter(error => error.status).map(error => error.status);
-			return res.status(validatorStatus && validatorStatus[0] || 400).json(failure(errors.map(e => `${e.varname} ${e.error}`).join(" "), errors));
+			return res.status(validatorStatus && validatorStatus[0] || 400).json(failure(errors.map(e => `${capitalize(e.varname)} ${e.error}`).join(", "), errors));
 		}
 
 		const result = await options.run({...validatedData, ...req.params}, req, res, next);
