@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/vrondakis/mel#readme",
   "dependencies": {
-
+    "deepcopy": "^2.0.0"
   },
   "devDependencies": {
     "mocha": "^6.2.2"
