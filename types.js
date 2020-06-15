@@ -85,8 +85,8 @@ exports.string = (name, description, options = {}) => {
 		type : "string",
 		schema : {
 			type : "string",
-			[options.minLength && "minimum"] : options.min || 0,
-			[options.maxLength && "maxLength"] : options.maxLength
+			minLength: options.minLength || 0,
+			...(options.maxLength ? {maxLength: options.maxLength} : {})
 		},
 		name,
 		description,
@@ -109,8 +109,6 @@ exports.oneOf = (name, description, options) => ({
 	options,
 	schema : {
 		type : "string",
-		minLength : options.values.reduce((a, b) => a.length > b.length ? a.length : b.length),
-		maxLength : options.values.reduce((a, b) => a.length < b.length ? a.length : b.length)
 	},
 	value : value => {
 		if(options.values.indexOf(value) === -1)
