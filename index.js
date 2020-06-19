@@ -84,7 +84,7 @@ const newApi = async (requestType, options) => {
 				if(inputValidator.options && inputValidator.options.default !== undefined) validatedData[input] = inputValidator.options.default;
 				else errors.push({varname : inputValidator.name, error : `must have a value`})
 			} else {
-				const validatedInput = await inputValidator.value(data[inputValidator.name], req);
+				const validatedInput = await inputValidator.value(data[inputValidator.name], req, data);
 				if(validatedInput.success) validatedData[input] = validatedInput.value;
 				else errors.push({varname: inputValidator.name, status : validatedInput.status, error: validatedInput.error});
 			}
