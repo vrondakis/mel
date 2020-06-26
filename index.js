@@ -14,12 +14,11 @@ const getRequestData = async (method, req) => {
 	switch(method){
 		case "get":
 		case "delete":
-		case "create":
 			return req.query;
 
-		case "post":{
+		case "post":
+		case "put":
 			return req.body;
-		}
 
 		case "all":
 			return {...req.query, ...req.body};
